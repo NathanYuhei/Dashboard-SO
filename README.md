@@ -1,12 +1,11 @@
 # Dashboard-SO
 
-comandos a serem executados para o programa funcionar:
+### comandos a serem executados para o programa funcionar:
 
 sudo apt-get install sysstat
 sudo apt-get install python3-tk
 
-Implementar: 
+## Implementar:
 
--Gráficos de barra e pizza
--Gráficos de consumo ao longo do tempo, igual no windows
-
+- Gráficos de barra e pizza
+- Gráficos de consumo ao longo do tempo, igual no windows
