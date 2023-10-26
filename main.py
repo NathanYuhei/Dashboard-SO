@@ -11,6 +11,7 @@ if __name__ == "__main__":
     model = Model()
     view = View(root)
     controller = Controller(model, view)
+    view.set_controller(controller)  # Define o controlador na instância da View
 
     def update():
         controller.update_system_info()

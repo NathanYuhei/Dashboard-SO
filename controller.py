@@ -39,3 +39,7 @@ class Controller:
         for pid, _, _ in processes:
             threads = self.model.get_threads(pid)
             self.view.display_total_threads(threads)
+
+    def get_process_details(self, pid):
+        return self.model.get_process_details(pid)
+

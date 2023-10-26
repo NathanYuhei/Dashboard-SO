@@ -83,3 +83,10 @@ class Model:
                 system_time = columns[3]
                 threads.append((thread_id, user_time, system_time))
         return threads
+
+    def get_process_details(self, pid):
+        result = subprocess.run(["ps", "-p", str(pid), "-o", "%cpu,%mem,cmd"], capture_output=True, text=True)
+        if result.returncode == 0:
+            return result.stdout
+        else:
+            return f"Não foi possível obter detalhes para o processo com PID {pid}"
