@@ -1,5 +1,6 @@
 
 import time
+
 import tkinter as tk
 
 from controller import Controller
@@ -14,7 +15,8 @@ if __name__ == "__main__":
     view.set_controller(controller)  # Define o controlador na instância da View
 
     def update():
-        controller.update_system_info()
+        #controller.update_system_info()
+        controller.update_memory_info()
         root.after(5000, update)
 
 
