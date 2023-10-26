@@ -1,7 +1,8 @@
 import threading
 import time
 import subprocess
-
+import os
+import pwd
 # FEITO Atualizar em intervalos regulares de tempo, 5 sec
 
 # TODO Mostrar informações globais do sistema
@@ -40,53 +41,76 @@ class Model:
     """
 
     def get_cpu_usage(self):
-        result = subprocess.run(["mpstat", "1", "1"], capture_output=True, text=True)
-        if result.returncode == 0:
-            lines = result.stdout.splitlines()
-            for line in lines:
-                if "all" in line:
-                    usage = line.split()[-1]
-                    usage = usage.replace(',', '.')  # Substitui vírgula por ponto
-                    return float(usage)
-        return 0.0
+        total_time = 0
+        with open('/proc/stat') as f:
+            line = f.readline()
+            parts = line.split()
+            total_time = sum(map(int, parts[1:]))
+            idle_time = int(parts[4])
+        return 100 - ((idle_time / total_time) * 100)
 
     def get_cpu_idle_time(self):
         return 100 - self.get_cpu_usage()
 
     def get_total_processes(self):
-        result = subprocess.run(["ps", "aux"], capture_output=True, text=True)
-        return len(result.stdout.split('\n')) - 1
+        process_count = 0
+        for _, dirs, _ in os.walk('/proc'):
+            for dir in dirs:
+                if dir.isdigit():
+                    process_count += 1
+        return process_count
 
     def get_total_threads(self):
-        result = subprocess.run(["ps", "-eT"], capture_output=True, text=True)
-        return len(result.stdout.split('\n')) - 1
+        thread_count = 0
+        for pid in os.listdir('/proc'):
+            if pid.isdigit():
+                try:
+                    with open(f'/proc/{pid}/status') as f:
+                        for line in f:
+                            if 'Threads' in line:
+                                thread_count += int(line.split()[1])
+                                break
+                except FileNotFoundError:
+                    pass
+        return thread_count
 
     def get_processes(self):
-        result = subprocess.run(["ps", "aux"], capture_output=True, text=True)
         processes = []
-        for line in result.stdout.split('\n')[1:-1]:
-            columns = line.split()
-            pid = int(columns[1])
-            user = columns[0]
-            name = columns[10]
-            processes.append((pid, name, user))
+        for pid in os.listdir('/proc'):
+            if pid.isdigit():
+                try:
+                    with open(f'/proc/{pid}/status') as f:
+                        name = ''
+                        user = ''
+                        for line in f:
+                            if 'Name' in line:
+                                name = line.split()[1]
+                            if 'Uid' in line:
+                                uid = line.split()[1]
+                                user = pwd.getpwuid(int(uid)).pw_name
+                        processes.append((int(pid), name, user))
+                except FileNotFoundError:
+                    pass
         return processes
 
     def get_threads(self, pid):
-        result = subprocess.run(["ps", "-eT"], capture_output=True, text=True)
         threads = []
-        for line in result.stdout.split('\n')[1:-1]:
-            columns = line.split()
-            if int(columns[0]) == pid:
-                thread_id = int(columns[1])
-                user_time = columns[2]
-                system_time = columns[3]
-                threads.append((thread_id, user_time, system_time))
+        try:
+            with open(f'/proc/{pid}/status') as f:
+                for line in f:
+                    if 'Threads' in line:
+                        threads.append(int(line.split()[1]))
+                        break
+        except FileNotFoundError:
+            pass
         return threads
 
     def get_process_details(self, pid):
-        result = subprocess.run(["ps", "-p", str(pid), "-o", "%cpu,%mem,cmd"], capture_output=True, text=True)
-        if result.returncode == 0:
-            return result.stdout
-        else:
-            return f"Não foi possível obter detalhes para o processo com PID {pid}"
+        details = ''
+        try:
+            with open(f'/proc/{pid}/status') as f:
+                for line in f:
+                    details += line
+        except FileNotFoundError:
+            pass
+        return details
