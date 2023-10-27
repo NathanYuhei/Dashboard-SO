@@ -43,3 +43,11 @@ class Controller:
     def get_process_details(self, pid):
         return self.model.get_process_details(pid)
 
+    def update_memory_info(self):
+        mem_info = self.model.get_memory_info()
+        self.view.show_memory_info(self.model.get_memory_percent_used())
+        self.view.show_memory_info(self.model.get_memory_percent_free())
+        self.view.show_memory_info(self.model.get_memory_total_RAM())
+        self.view.show_memory_info(self.model.get_memory_total_virtual())
+        self.view.show_memory_info(self.model.get_processes())
+
