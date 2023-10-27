@@ -54,3 +54,6 @@ class View:
 
             details_label = tk.Label(details_window, text=details)
             details_label.pack()
+
+    def show_memory_info(self, mem_info):
+        print(mem_info)
