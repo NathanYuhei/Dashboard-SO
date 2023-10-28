@@ -4,50 +4,48 @@ from view import View
 
 class Controller:
 
-    """
-    def run(self):
-        memory_info = Model.getMemoryInfo()
-        View.printMemoryInfo(memory_info)
-    """
-
     def __init__(self, model, view):
         self.model = model
         self.view = view
 
     def update_system_info(self):
         # Uso de CPU
-        cpu_usage = self.model.get_cpu_usage()
-        self.view.display_cpu_usage(cpu_usage)
+        #cpu_usage = self.model.get_cpu_usage()
+        #self.view.display_cpu_usage(cpu_usage)
 
         # Tempo ocioso de CPU
-        cpu_idle_time = self.model.get_cpu_idle_time()
-        self.view.display_cpu_idle_time(cpu_idle_time)
+        #cpu_idle_time = self.model.get_cpu_idle_time()
+        #self.view.display_cpu_idle_time(cpu_idle_time)
 
         # Total de processos
-        total_processes = self.model.get_total_processes()
-        self.view.display_total_processes(total_processes)
+        #total_processes = self.model.get_total_processes()
+        #self.view.display_total_processes(total_processes)
 
         # Total de threads
-        total_threads = self.model.get_total_threads()
-        self.view.display_total_threads(total_threads)
+        #total_threads = self.model.get_total_threads()
+        #self.view.display_total_threads(total_threads)
 
         # Exibição dos processos
         processes = self.model.get_processes()
         self.view.display_processes(processes)
 
         # Exibição dos threads de cada processo
-        for pid, _, _ in processes:
+        '''for pid, _, _ in processes:
             threads = self.model.get_threads(pid)
-            self.view.display_total_threads(threads)
+            self.view.display_total_threads(threads)'''
 
     def get_process_details(self, pid):
         return self.model.get_process_details(pid)
 
     def update_memory_info(self):
-        mem_info = self.model.get_memory_info()
-        self.view.show_memory_info(self.model.get_memory_percent_used())
-        self.view.show_memory_info(self.model.get_memory_percent_free())
-        self.view.show_memory_info(self.model.get_memory_total_RAM())
-        self.view.show_memory_info(self.model.get_memory_total_virtual())
-        self.view.show_memory_info(self.model.get_processes())
+        mem_percent_used = self.model.get_memory_percent_used()
+        mem_percent_free = self.model.get_memory_percent_free()
+        mem_total_ram = self.model.get_memory_total_RAM()
+        mem_total_virtual = self.model.get_memory_total_virtual()
+
+
+        self.view.display_memory_used(mem_percent_used)
+        self.view.display_memory_free(mem_percent_free)
+        self.view.display_total_ram(mem_total_ram)
+        self.view.display_total_virtual(mem_total_virtual)
 

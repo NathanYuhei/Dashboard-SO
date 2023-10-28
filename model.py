@@ -8,7 +8,6 @@ import pwd
 # TODO Mostrar informações globais do sistema
 # TODO Mostrar informações individualizadas por processo
 # TODO Software multitarefa (threads)
-# TODO Utilizar o padrão MVC
 
 
 class Model:
@@ -88,8 +87,9 @@ class Model:
                     pass
         return thread_count
 
-        def get_processes(self):
+    def get_processes(self):
         processes = []
+        #processes_details = []
         for pid in os.listdir('/proc'):
             if pid.isdigit():
                 try:
@@ -106,21 +106,21 @@ class Model:
                             elif 'Uid' in line:
                                 uid = line.split()[1]
                                 user = pwd.getpwuid(int(uid)).pw_name
-                            elif 'VmPeak' in line:
+                            '''elif 'VmPeak' in line:
                                 vmPeak = line.split()[1]
                             elif 'VmSize' in line:
                                 vmSize = line.split()[1]
                             elif 'VmExe' in line:
                                 vmExe = line.split()[1]
                             elif 'VmStk' in line:
-                                vmStk = line.split()[1]
+                                vmStk = line.split()[1]'''
 
-
-
-                        processes.append((int(pid), name, user, vmPeak, vmSize, vmStk, vmExe))
+                        processes.append((int(pid), name, user))
+                        #processes_details.append((vmPeak, vmSize, vmStk, vmExe))
                 except FileNotFoundError:
                     pass
         return processes
+
 
     def get_threads(self, pid):
         threads = []
