@@ -24,22 +24,26 @@ class Model:
 
     def get_memory_percent_used(self):
         data = self.get_memory_info()
-        mem_used_percent = ((float(data['MemTotal']) - float(data['MemFree'])) / float(data['MemTotal'])) * 100
+        used = float(data['MemTotal']) - float(data['MemFree']) - float(data['Buffers']) - float(data['Cached'])
 
-        percent_used = "Memória Usada: " + str(int(mem_used_percent)) + '%'
+        mem_used = (used / 1024) / 1024
+        mem_used_percent = (used / float(data['MemTotal'])) * 100
+
+        percent_used = f"Memória Usada: {mem_used:.1f}GB ({mem_used_percent:.2f}%)"
 
         return percent_used
 
     def get_memory_percent_free(self):
         data = self.get_memory_info()
-        percent_free = int((float(data['MemFree']) / float(data['MemTotal'])) * 100)
-        final_data = "Memória Livre: " + str(percent_free) + '%'
+        mem_free = (float(data['MemFree']) / 1024) / 1024
+        percent_free = (float(data['MemFree']) / float(data['MemTotal'])) * 100
+        final_data = f"Memória Livre: {mem_free:.1f}GB ({percent_free:.2f}%)"
         return final_data
 
     def get_memory_total_RAM(self):
         data = self.get_memory_info()
         memTotal = (float(data['MemTotal']) / 1024) / 1024
-        final_data = 'Memória Física: ' + str(int(memTotal)) + 'GB'
+        final_data = f'Memória Física: {memTotal:.1f} GB'
 
         return final_data
 
@@ -49,6 +53,16 @@ class Model:
         final_data = "Memória Virtual: " + str(int(vmTotal)) + 'GB'
 
         return final_data
+
+    def get_memory_buffer_cache(self):
+        data = self.get_memory_info()
+        bf = float(data['Buffers']) + float(data['Cached'])
+        buffer_cache = (bf / 1024) / 1024
+        percent_bf = (bf / float(data['MemTotal'])) * 100
+        final_data = f"Buffer/cache {buffer_cache:.1f}GB ({percent_bf:.2f}%)"
+
+        return final_data
+
 
     def get_cpu_usage(self):
         total_time = 0
@@ -132,6 +146,9 @@ class Model:
         return threads
 
     def get_process_details(self, pid):
+        data = self.get_memory_info()
+        MemTotal = float(data['MemTotal'])
+
         details = {
             'Name': '',
             'State': '',
@@ -139,6 +156,10 @@ class Model:
             'Páginas (total)': '0',
             'Páginas (de Código)': '0',
             'Páginas (Stack)': '0',
+            'Uptime': '',
+            'Priority': '',
+            'Nice': '',
+            'Uso da Memória': '',
             'VmPeak': '0',
             'VmSize': '0',
             'VmExe': '0',
@@ -170,8 +191,20 @@ class Model:
                         details['Páginas (Stack)'] = int(vmStk) / (4 * 1024)
                     elif 'Threads' in line:
                         details['Threads'] = line.split()[1]
+                    elif 'VmRSS' in line:
+                        vmRSS = line.split()[1]
+                        details['Uso da Memória'] = f'{(float(vmRSS) / MemTotal) * 100:.2f}%'
         except FileNotFoundError:
             pass
 
-        print(details)
+        try:
+            with open(f'/proc/{pid}/stat') as f:
+                data = f.read().split()
+                print(data)
+                details['Uptime'] = float(data[13]) / 100  # Converter para segundos
+                details['Priority'] = int(data[17])
+                details['Nice'] = int(data[18])
+
+        except FileNotFoundError:
+            pass
         return details

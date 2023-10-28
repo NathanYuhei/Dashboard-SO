@@ -5,7 +5,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import re
 import threading
 
-
 class View:
     def __init__(self, root):
         self.root = root
@@ -17,6 +16,9 @@ class View:
                                             highlightcolor="light gray", relief="solid", width=40, height=30)
 
         self.processes_listbox.bind("<Double-Button-1>", self.show_process_details)
+        # self.create_graph(root)
+
+        self.processes_label = tk.Label(self.root, text='Processos')
 
         self.cpu_usage_label = tk.Label(self.root)
         self.cpu_idle_time_label = tk.Label(self.root)
@@ -27,31 +29,35 @@ class View:
         self.memory_free_percent_label = tk.Label(self.root)
         self.memory_total_ram_label = tk.Label(self.root)
         self.memory_total_virtual_label = tk.Label(self.root)
+        self.memory_total_buffercache_label = tk.Label(self.root)
 
-        self.cpu_usage_label.grid(row=0, column=2)
-        self.cpu_idle_time_label.grid(row=1, column=2)
-        self.total_processes_label.grid(row=2, column=2)
-        self.total_threads_label.grid(row=3, column=2)
+        self.cpu_usage_label.grid(row=1, column=3)
+        self.cpu_idle_time_label.grid(row=2, column=3)
+        self.total_processes_label.grid(row=3, column=3)
+        self.total_threads_label.grid(row=4, column=3)
 
-        self.memory_used_percent_label.grid(row=0, column=1)
-        self.memory_free_percent_label.grid(row=1, column=1)
-        self.memory_total_ram_label.grid(row=2, column=1)
-        self.memory_total_virtual_label.grid(row=3, column=1)
+        self.memory_used_percent_label.grid(row=1, column=1)
+        self.memory_free_percent_label.grid(row=2, column=1)
+        self.memory_total_buffercache_label.grid(row=3, column=1)
+        self.memory_total_ram_label.grid(row=4, column=1)
+        self.memory_total_virtual_label.grid(row=5, column=1)
 
-        self.processes_listbox.grid(row=0, column=0, rowspan=6)
+        self.processes_label.grid(row=0, column=0)
+        self.processes_listbox.grid(row=1, column=0, rowspan=6)
 
         #incializando thread para gráfico
-        self.graph_thread = threading.Thread(target=self.create_graph, args=(self.root,))
-        self.graph_thread.start()
+        #self.graph_thread = threading.Thread(target=self.create_graph, args=(self.root,))
+        #self.graph_thread.start()
+
 
     def set_controller(self, controller):
         self.controller = controller
 
     def display_cpu_usage(self, usage):
-        self.cpu_usage_label.config(text=f"Uso do CPU: {usage}%")
+        self.cpu_usage_label.config(text=f"Uso do CPU: {usage:.1f}%")
 
     def display_cpu_idle_time(self, idle_time):
-        self.cpu_idle_time_label.config(text=f"Tempo ocioso do CPU: {idle_time}%")
+        self.cpu_idle_time_label.config(text=f"Tempo ocioso do CPU: {idle_time:.1f}%")
 
     def display_total_processes(self, total_processes):
         self.total_processes_label.config(text=f"Total de processos: {total_processes}")
@@ -72,7 +78,7 @@ class View:
             pid = self.get_pid(selected_process)
             details = self.controller.get_process_details(pid)  # Agora pode chamar a função em Controller
             details_window = tk.Toplevel(self.root)
-            details_window.geometry('400x300')
+            details_window.geometry('400x500')
             details_window.title(f"Detalhes do Processo {pid}")
 
             for key, value in details.items():
@@ -92,6 +98,9 @@ class View:
 
     def display_total_virtual(self, virtual):
         self.memory_total_virtual_label.config(text=f"{virtual}")
+
+    def display_buffercache(self, buffercache):
+        self.memory_total_buffercache_label.config(text=f"{buffercache}")
 
     def run(self):
         self.root.mainloop()
