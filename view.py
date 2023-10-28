@@ -4,6 +4,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import re
 
+
 class View:
     def __init__(self, root):
         self.root = root
@@ -11,34 +12,26 @@ class View:
         self.controller = None
         self.root.title("Dashboard de SO")
 
-
         self.processes_listbox = tk.Listbox(root, selectmode=tk.SINGLE,
                                             highlightcolor="light gray", relief="solid", width=40, height=30)
 
         self.processes_listbox.bind("<Double-Button-1>", self.show_process_details)
-        #self.create_graph(root)
+        # self.create_graph(root)
 
-
-        '''self.cpu_usage_label = tk.Label(root, text="Uso do CPU: ")
-        self.cpu_usage_label.pack()
-
-        self.cpu_idle_time_label = tk.Label(root, text="Tempo ocioso do CPU: ")
-        self.cpu_idle_time_label.pack()
-
-        self.total_processes_label = tk.Label(root, text="Total de processos: ")
-        self.total_processes_label.pack()
-
-        self.total_threads_label = tk.Label(root, text="Total de threads: ")
-        self.total_threads_label.pack()
-
-        self.processes_listbox = tk.Listbox(root)
-        self.processes_listbox.pack()
-        '''
+        self.cpu_usage_label = tk.Label(self.root)
+        self.cpu_idle_time_label = tk.Label(self.root)
+        self.total_processes_label = tk.Label(self.root)
+        self.total_threads_label = tk.Label(self.root)
 
         self.memory_used_percent_label = tk.Label(self.root)
         self.memory_free_percent_label = tk.Label(self.root)
         self.memory_total_ram_label = tk.Label(self.root)
         self.memory_total_virtual_label = tk.Label(self.root)
+
+        self.cpu_usage_label.grid(row=0, column=2)
+        self.cpu_idle_time_label.grid(row=1, column=2)
+        self.total_processes_label.grid(row=2, column=2)
+        self.total_threads_label.grid(row=3, column=2)
 
         self.memory_used_percent_label.grid(row=0, column=1)
         self.memory_free_percent_label.grid(row=1, column=1)
@@ -47,11 +40,9 @@ class View:
 
         self.processes_listbox.grid(row=0, column=0, rowspan=6)
 
-
-
     def set_controller(self, controller):
         self.controller = controller
-    
+
     def display_cpu_usage(self, usage):
         self.cpu_usage_label.config(text=f"Uso do CPU: {usage}%")
 
@@ -77,11 +68,14 @@ class View:
             pid = self.get_pid(selected_process)
             details = self.controller.get_process_details(pid)  # Agora pode chamar a função em Controller
             details_window = tk.Toplevel(self.root)
-            details_window.geometry('300x300')
+            details_window.geometry('400x300')
             details_window.title(f"Detalhes do Processo {pid}")
 
-            details_label = tk.Label(details_window, text=details)
-            details_label.pack()
+            for key, value in details.items():
+                label_text = f"{key}: {value}"
+                label = tk.Label(details_window, text=label_text)
+                label.pack()
+
 
     def display_memory_used(self, used):
         self.memory_used_percent_label.config(text=f"{used}")
@@ -125,7 +119,8 @@ class View:
 
         get_new_data()  # Inicializa a primeira atualização com dados iniciais
 
-    def get_pid(self, input_string):
+    @staticmethod
+    def get_pid(input_string):
         match = re.search(r'\((\d+)\)', input_string)
         if match:
             num = int(match.group(1))

@@ -3,9 +3,6 @@ import time
 import subprocess
 import os
 import pwd
-# FEITO Atualizar em intervalos regulares de tempo, 5 sec
-
-# TODO Mostrar informações globais do sistema
 # TODO Mostrar informações individualizadas por processo
 # TODO Software multitarefa (threads)
 
@@ -135,11 +132,46 @@ class Model:
         return threads
 
     def get_process_details(self, pid):
-        details = ''
+        details = {
+            'Name': '',
+            'State': '',
+            'Memória Alocada': '0',
+            'Páginas (total)': '0',
+            'Páginas (de Código)': '0',
+            'Páginas (Stack)': '0',
+            'VmPeak': '0',
+            'VmSize': '0',
+            'VmExe': '0',
+            'VmStk': '0',
+            'Threads': '0',
+        }
         try:
             with open(f'/proc/{pid}/status') as f:
                 for line in f:
-                    details += line
+                    if 'Name' in line:
+                        details['Name'] = line.split()[1]
+                    elif 'State' in line:
+                        details['State'] = line.split(':', 1)[1].strip()
+                    elif 'VmPeak' in line:
+                        vmPeak = line.split()[1]
+                        details['VmPeak'] = vmPeak + 'KB'
+                        details['Memória Alocada'] = vmPeak + 'KB'
+                    elif 'VmSize' in line:
+                        vmSize = line.split()[1]
+                        details['VmSize'] = vmSize + 'KB'
+                        details['Páginas (total)'] = int(int(vmSize) / (4 * 1024))
+                    elif 'VmExe' in line:
+                        vmExe = line.split()[1]
+                        details['VmExe'] = vmExe + 'KB'
+                        details['Páginas (de Código)'] = int(vmExe) / (4 * 1024)
+                    elif 'VmStk' in line:
+                        vmStk = line.split()[1]
+                        details['VmStk'] = vmStk + 'KB'
+                        details['Páginas (Stack)'] = int(vmStk) / (4 * 1024)
+                    elif 'Threads' in line:
+                        details['Threads'] = line.split()[1]
         except FileNotFoundError:
             pass
+
+        print(details)
         return details
