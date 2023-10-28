@@ -3,6 +3,7 @@ import tkinter as tk
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import re
+import threading
 
 
 class View:
@@ -16,7 +17,6 @@ class View:
                                             highlightcolor="light gray", relief="solid", width=40, height=30)
 
         self.processes_listbox.bind("<Double-Button-1>", self.show_process_details)
-        # self.create_graph(root)
 
         self.cpu_usage_label = tk.Label(self.root)
         self.cpu_idle_time_label = tk.Label(self.root)
@@ -39,6 +39,10 @@ class View:
         self.memory_total_virtual_label.grid(row=3, column=1)
 
         self.processes_listbox.grid(row=0, column=0, rowspan=6)
+
+        #incializando thread para gráfico
+        self.graph_thread = threading.Thread(target=self.create_graph, args=(self.root,))
+        self.graph_thread.start()
 
     def set_controller(self, controller):
         self.controller = controller
