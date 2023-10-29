@@ -1,6 +1,7 @@
 
 import time
 import tkinter as tk
+import threading
 
 from controller import Controller
 from model import Model
@@ -20,6 +21,10 @@ if __name__ == "__main__":
     model = Model()
     view = View(root)
     controller = Controller(model, view)
+
+    #thread para atualizar os dados
+    update_thread = threading.Thread(target=update)
+    update_thread.start()
 
     view.set_controller(controller)  # Define o controlador na instância da View
     update()
