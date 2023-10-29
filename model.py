@@ -1,6 +1,5 @@
 import threading
 import time
-import subprocess
 import os
 import pwd
 import psutil
@@ -65,7 +64,7 @@ class Model:
         return final_data
 
 
-    # Métodos para obter o dados de CPU.
+    # Métod para obter o dad de CPU.
     def get_cpu_usage(self):
         total_time = 0
         with open('/proc/stat') as f:
