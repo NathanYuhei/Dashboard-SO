@@ -40,10 +40,19 @@ class Controller:
         self.view.display_processes(processes)
 
     def update_memory_info(self):
+        # Uso da memória
         mem_percent_used = self.model.get_memory_percent_used()
+        
+        # Memória livre
         mem_percent_free = self.model.get_memory_percent_free()
+
+        # Memória total (ram)
         mem_total_ram = self.model.get_memory_total_RAM()
+
+        # Memória total (virtual)
         mem_total_virtual = self.model.get_memory_total_virtual()
+
+        # Cache e buffer somados
         mem_cached_buffer = self.model.get_memory_buffer_cache()
 
         self.view.display_memory_used(mem_percent_used)
