@@ -9,9 +9,9 @@ class Controller:
         self.model = model
         self.view = view
 
-        #inciando thread
-        #self.controller_thread = threading.Thread(target=self.run_threaded_functions)
-        #self.controller_thread.start()
+        #inciando thread de atualização das informações
+        self.controller_thread = threading.Thread(target=self.run_threaded_functions)
+        self.controller_thread.start()
 
     def run_threaded_functions(self):
         self.update_system_info()
