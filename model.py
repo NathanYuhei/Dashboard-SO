@@ -12,7 +12,7 @@ class Model:
         info = {}
         with open('/proc/meminfo') as meminfo_file:
             for line in meminfo_file:
-                parts = line.split(':')
+                parts = line.split(':') # separando chaves e valores
                 if len(parts) == 2:
                     key = parts[0].strip()
                     value = parts[1].strip().split()[0]
@@ -22,11 +22,13 @@ class Model:
 
     # Métodos para dados da memória
     def get_memory_percent_used(self):
-        data = self.get_memory_info()
+        data = self.get_memory_info() # buscando os dados de proc/meminfo
+
+        # Calculo da memória usada Total - (Livre - Buffer - Cache)
         used = float(data['MemTotal']) - float(data['MemFree']) - float(data['Buffers']) - float(data['Cached'])
 
-        mem_used = (used / 1024) / 1024
-        mem_used_percent = (used / float(data['MemTotal'])) * 100
+        mem_used = (used / 1024) / 1024 # convertendo para GB
+        mem_used_percent = (used / float(data['MemTotal'])) * 100 # Calculando a % a partir do total
 
         percent_used = f"Memória Usada: {mem_used:.1f}GB ({mem_used_percent:.2f}%)"
 
@@ -64,7 +66,7 @@ class Model:
         return final_data
 
 
-    # Métod para obter o dad de CPU.
+    # Método para obter o dados de CPU.
     def get_cpu_usage(self):
         total_time = 0
         with open('/proc/stat') as f:
@@ -103,7 +105,7 @@ class Model:
     # Método para obter a lista de processos
     def get_processes(self):
         processes = []
-        #processes_details = []
+
         for pid in os.listdir('/proc'):
             if pid.isdigit():
                 try:
@@ -120,17 +122,9 @@ class Model:
                             elif 'Uid' in line:
                                 uid = line.split()[1]
                                 user = pwd.getpwuid(int(uid)).pw_name
-                            '''elif 'VmPeak' in line:
-                                vmPeak = line.split()[1]
-                            elif 'VmSize' in line:
-                                vmSize = line.split()[1]
-                            elif 'VmExe' in line:
-                                vmExe = line.split()[1]
-                            elif 'VmStk' in line:
-                                vmStk = line.split()[1]'''
 
                         processes.append((int(pid), name, user))
-                        #processes_details.append((vmPeak, vmSize, vmStk, vmExe))
+                        
                 except FileNotFoundError:
                     pass
         return processes
@@ -184,7 +178,7 @@ class Model:
                     elif 'VmSize' in line:
                         vmSize = line.split()[1]
                         details['VmSize'] = vmSize + 'KB'
-                        details['Páginas (total)'] = int(int(vmSize) / (4 * 1024))
+                        details['Páginas (total)'] = int(int(vmSize) / (4 * 1024)) # divisão por 4KB (4 * 1024)
                     elif 'VmExe' in line:
                         vmExe = line.split()[1]
                         details['VmExe'] = vmExe + 'KB'
@@ -211,6 +205,7 @@ class Model:
 
         except FileNotFoundError:
             pass
+        # obter uso da cpu por processo 
         processo = psutil.Process(pid)
         uso_cpu = processo.cpu_percent()
         details['Uso da CPU'] = f'{uso_cpu}%'
