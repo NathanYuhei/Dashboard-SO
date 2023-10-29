@@ -24,7 +24,8 @@ if __name__ == "__main__":
     update_thread = threading.Thread(target=update)
     update_thread.start()
 
-    view.set_controller(controller)  # Define o controlador na instância da View
+    #define o controlador na instância da View
+    view.set_controller(controller)  
     update()
 
     view.run()
