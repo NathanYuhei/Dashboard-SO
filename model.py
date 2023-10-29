@@ -3,7 +3,7 @@ import time
 import subprocess
 import os
 import pwd
-
+import psutil
 
 class Model:
 
@@ -212,4 +212,7 @@ class Model:
 
         except FileNotFoundError:
             pass
+        processo = psutil.Process(pid)
+        uso_cpu = processo.cpu_percent()
+        details['Uso da CPU'] = f'{uso_cpu}%'
         return details
