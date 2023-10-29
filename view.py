@@ -91,20 +91,30 @@ class View:
             self.processes_listbox.insert(tk.END, f"User {name} ({pid}): {user}")
 
     def show_process_details(self, event):
+
         selected_index = self.processes_listbox.curselection()
         if selected_index:
-            selected_process = self.processes_listbox.get(selected_index)
-            pid = self.get_pid(selected_process)
-            details = self.controller.get_process_details(pid)  # Agora pode chamar a função em Controller
+
             details_window = tk.Toplevel(self.root)
             details_window.geometry('400x500')
-            details_window.title(f"Detalhes do Processo {pid}")
 
-            for key, value in details.items():
-                label_text = f"{key}: {value}"
-                label = tk.Label(details_window, text=label_text)
-                label.pack()
+            def update_details():
+                selected_process = self.processes_listbox.get(selected_index)
+                pid = self.get_pid(selected_process)
+                details_window.title(f"Detalhes do Processo {pid}")
+                details = self.controller.get_process_details(pid)
 
+                for widget in details_window.winfo_children():
+                    widget.destroy()
+                    
+                for key, value in details.items():
+                    label_text = f"{key}: {value}"
+                    label = tk.Label(details_window, text=label_text)
+                    label.pack()
+
+                details_window.after(5000, update_details)
+
+            update_details()
 
     # Métodos para exibir informações sobre memória
     def display_memory_used(self, used):
