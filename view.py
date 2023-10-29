@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import re
 import threading
 
-
 class View:
     def __init__(self, root):
         self.root = root
@@ -19,6 +18,8 @@ class View:
 
         self.processes_listbox.bind("<Double-Button-1>", self.show_process_details)
 
+        self.processes_label = tk.Label(self.root, text='Processos')
+
         self.cpu_usage_label = tk.Label(self.root)
         self.cpu_idle_time_label = tk.Label(self.root)
         self.total_processes_label = tk.Label(self.root)
@@ -28,18 +29,21 @@ class View:
         self.memory_free_percent_label = tk.Label(self.root)
         self.memory_total_ram_label = tk.Label(self.root)
         self.memory_total_virtual_label = tk.Label(self.root)
+        self.memory_total_buffercache_label = tk.Label(self.root)
 
-        self.cpu_usage_label.grid(row=0, column=2)
-        self.cpu_idle_time_label.grid(row=1, column=2)
-        self.total_processes_label.grid(row=2, column=2)
-        self.total_threads_label.grid(row=3, column=2)
+        self.cpu_usage_label.grid(row=1, column=3)
+        self.cpu_idle_time_label.grid(row=2, column=3)
+        self.total_processes_label.grid(row=3, column=3)
+        self.total_threads_label.grid(row=4, column=3)
 
-        self.memory_used_percent_label.grid(row=0, column=1)
-        self.memory_free_percent_label.grid(row=1, column=1)
-        self.memory_total_ram_label.grid(row=2, column=1)
-        self.memory_total_virtual_label.grid(row=3, column=1)
+        self.memory_used_percent_label.grid(row=1, column=1)
+        self.memory_free_percent_label.grid(row=2, column=1)
+        self.memory_total_buffercache_label.grid(row=3, column=1)
+        self.memory_total_ram_label.grid(row=4, column=1)
+        self.memory_total_virtual_label.grid(row=5, column=1)
 
-        self.processes_listbox.grid(row=0, column=0, rowspan=6)
+        self.processes_label.grid(row=0, column=0)
+        self.processes_listbox.grid(row=1, column=0, rowspan=6)
 
         #incializando thread para gráfico
         #self.graph_thread = threading.Thread(target=self.create_graph, args=(self.root,))
@@ -49,29 +53,29 @@ class View:
         self.cpu_fig, self.cpu_ax = plt.subplots(figsize=(5, 4))
         self.cpu_line, = self.cpu_ax.plot([], [], label="Uso da CPU")
         self.cpu_canvas = FigureCanvasTkAgg(self.cpu_fig, master=self.root)
-        self.cpu_canvas.get_tk_widget().grid(row=4, column=2)
+        self.cpu_canvas.get_tk_widget().grid(row=0, column=4, rowspan=6)
         self.cpu_data_history = []
 
         # Gráfico de pizza para uso da memória
         self.memory_fig, self.memory_ax = plt.subplots(figsize=(5, 4))
         self.memory_ax.set_title("Uso da Memória")
         self.memory_canvas = FigureCanvasTkAgg(self.memory_fig, master=self.root)
-        self.memory_canvas.get_tk_widget().grid(row=4, column=3)
+        self.memory_canvas.get_tk_widget().grid(row=6, column=4, rowspan=6)
 
         # Gráfico de barras para processos vs. threads
         self.processes_threads_fig, self.processes_threads_ax = plt.subplots(figsize=(5, 4))
         self.processes_threads_ax.set_title("Processos vs. Threads")
         self.processes_threads_canvas = FigureCanvasTkAgg(self.processes_threads_fig, master=self.root)
-        self.processes_threads_canvas.get_tk_widget().grid(row=5, column=2)
+        self.processes_threads_canvas.get_tk_widget().grid(row=0, column=5, rowspan=6)
 
     def set_controller(self, controller):
         self.controller = controller
 
     def display_cpu_usage(self, usage):
-        self.cpu_usage_label.config(text=f"Uso do CPU: {usage}%")
+        self.cpu_usage_label.config(text=f"Uso do CPU: {usage:.1f}%")
 
     def display_cpu_idle_time(self, idle_time):
-        self.cpu_idle_time_label.config(text=f"Tempo ocioso do CPU: {idle_time}%")
+        self.cpu_idle_time_label.config(text=f"Tempo ocioso do CPU: {idle_time:.1f}%")
 
     def display_total_processes(self, total_processes):
         self.total_processes_label.config(text=f"Total de processos: {total_processes}")
@@ -92,13 +96,14 @@ class View:
             pid = self.get_pid(selected_process)
             details = self.controller.get_process_details(pid)  # Agora pode chamar a função em Controller
             details_window = tk.Toplevel(self.root)
-            details_window.geometry('400x300')
+            details_window.geometry('400x500')
             details_window.title(f"Detalhes do Processo {pid}")
 
             for key, value in details.items():
                 label_text = f"{key}: {value}"
                 label = tk.Label(details_window, text=label_text)
                 label.pack()
+
 
     def display_memory_used(self, used):
         self.memory_used_percent_label.config(text=f"{used}")
@@ -111,6 +116,9 @@ class View:
 
     def display_total_virtual(self, virtual):
         self.memory_total_virtual_label.config(text=f"{virtual}")
+
+    def display_buffercache(self, buffercache):
+        self.memory_total_buffercache_label.config(text=f"{buffercache}")
 
     def run(self):
         self.root.mainloop()
@@ -132,8 +140,8 @@ class View:
 
         # Exemplo de função para fornecer novos dados
         def get_new_data():
-            x_data = [1, 2, 3, 4]
-            y_data = [10, 5, 12, 7]
+            x_data = [1, 2, 3, 4]  # Seus próprios valores de x
+            y_data = [10, 5, 12, 7]  # Seus próprios valores de y
 
             update_graph(x_data, y_data)
 
@@ -151,7 +159,6 @@ class View:
         else:
             return None
 
-    #grafico do uso de CPU ao longo do tempo
     def create_cpu_usage_graph(self, window):
         fig = Figure(figsize=(5, 4), dpi=100)
         plot = fig.add_subplot(111)
@@ -181,7 +188,7 @@ class View:
 
         update_graph()
 
-    #grafico de memoria usada/livre
+    # grafico de memoria usada/livre
     def create_memory_pie_chart(self, window):
         fig = Figure(figsize=(5, 4), dpi=100)
         plot = fig.add_subplot(111)
@@ -196,7 +203,7 @@ class View:
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.grid(row=0, column=3)
 
-    #grafico de total de processos e threads
+    # grafico de total de processos e threads
     def create_processes_threads_bar_chart(self, window):
         fig = Figure(figsize=(5, 4), dpi=100)
         plot = fig.add_subplot(111)
@@ -241,7 +248,7 @@ class View:
 
         mem_used = extract_number(mem_used_str)
         mem_free = extract_number(mem_free_str)
-        
+
         # Dados para o gráfico de pizza
         memory_data = [mem_used, mem_free]
         labels = ['Used(%)', 'Free(%)']
@@ -253,7 +260,6 @@ class View:
         # Atualizar o gráfico de pizza
         self.memory_ax.pie(memory_data, labels=labels, colors=colors, autopct='%1.1f%%')
         self.memory_ax.set_title('Memória livre vs utilizada (%)')
-
 
         # Redesenhe o gráfico
         self.memory_canvas.draw()

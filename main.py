@@ -1,4 +1,3 @@
-
 import time
 import tkinter as tk
 import threading
@@ -14,7 +13,6 @@ if __name__ == "__main__":
         controller.update_memory_info()
         controller.update_graph_info()
         root.after(5000, update)
-
 
     root = tk.Tk()
 
