@@ -11,6 +11,7 @@ if __name__ == "__main__":
     def update():
         controller.update_system_info()
         controller.update_memory_info()
+        controller.update_graph_info()
         root.after(5000, update)
 
 
