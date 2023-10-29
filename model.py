@@ -3,12 +3,11 @@ import time
 import subprocess
 import os
 import pwd
-# TODO Mostrar informações individualizadas por processo
-# TODO Software multitarefa (threads)
 
 
 class Model:
 
+    # Método estático para obter informações sobre a memória do sistema.
     @staticmethod
     def get_memory_info():
         info = {}
@@ -22,6 +21,7 @@ class Model:
 
         return info
 
+    # Métodos para dados da memória
     def get_memory_percent_used(self):
         data = self.get_memory_info()
         used = float(data['MemTotal']) - float(data['MemFree']) - float(data['Buffers']) - float(data['Cached'])
@@ -32,7 +32,7 @@ class Model:
         percent_used = f"Memória Usada: {mem_used:.1f}GB ({mem_used_percent:.2f}%)"
 
         return percent_used
-
+        
     def get_memory_percent_free(self):
         data = self.get_memory_info()
         mem_free = (float(data['MemFree']) / 1024) / 1024
@@ -54,6 +54,7 @@ class Model:
 
         return final_data
 
+    # Método para obter o total de memória usado em buffers e cache
     def get_memory_buffer_cache(self):
         data = self.get_memory_info()
         bf = float(data['Buffers']) + float(data['Cached'])
@@ -64,6 +65,7 @@ class Model:
         return final_data
 
 
+    # Métodos para obter o dados de CPU.
     def get_cpu_usage(self):
         total_time = 0
         with open('/proc/stat') as f:
@@ -84,6 +86,7 @@ class Model:
                     process_count += 1
         return process_count
 
+    # Método para contar o total de threads
     def get_total_threads(self):
         thread_count = 0
         for pid in os.listdir('/proc'):
@@ -98,6 +101,7 @@ class Model:
                     pass
         return thread_count
 
+    # Método para obter a lista de processos
     def get_processes(self):
         processes = []
         #processes_details = []
@@ -132,7 +136,7 @@ class Model:
                     pass
         return processes
 
-
+     # Método para obter a lista de threads de um processo.
     def get_threads(self, pid):
         threads = []
         try:
@@ -145,6 +149,7 @@ class Model:
             pass
         return threads
 
+    # Obter os detalhes de um processo
     def get_process_details(self, pid):
         data = self.get_memory_info()
         MemTotal = float(data['MemTotal'])
