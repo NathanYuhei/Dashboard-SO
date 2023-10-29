@@ -4,7 +4,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import re
-import threading
+
 
 class View:
     def __init__(self, root):
@@ -134,32 +134,6 @@ class View:
 
     def run(self):
         self.root.mainloop()
-
-    def create_graph(self, window):
-        fig = Figure(figsize=(5, 4), dpi=100)
-        plot = fig.add_subplot(111)
-        line, = plot.plot([], [], marker='o')  
-
-        canvas = FigureCanvasTkAgg(fig, master=window)
-        canvas_widget = canvas.get_tk_widget()
-        canvas_widget.grid(row=0, column=1)
-
-        def update_graph(x_data, y_data):
-            line.set_data(x_data, y_data)  
-            plot.relim() 
-            plot.autoscale_view() 
-            canvas.draw() o
-
-       
-        def get_new_data():
-            x_data = [1, 2, 3, 4]  
-            y_data = [10, 5, 12, 7]  
-
-            update_graph(x_data, y_data)
-          
-            window.after(5000, get_new_data)
-
-        get_new_data()
 
     @staticmethod
     def get_pid(input_string):
