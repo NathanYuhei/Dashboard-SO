@@ -12,6 +12,7 @@ class Controller:
         self.controller_thread = threading.Thread(target=self.run_threaded_functions)
         self.controller_thread.start()
 
+    #funções que serão executadas no loop
     def run_threaded_functions(self):
         self.update_system_info()
         self.update_memory_info()
@@ -37,11 +38,6 @@ class Controller:
         # Exibição dos processos
         processes = self.model.get_processes()
         self.view.display_processes(processes)
-
-        # Exibição dos threads de cada processo
-        '''for pid, _, _ in processes:
-            threads = self.model.get_threads(pid)
-            self.view.display_total_threads(threads)'''
 
     def update_memory_info(self):
         mem_percent_used = self.model.get_memory_percent_used()
