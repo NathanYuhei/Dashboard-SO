@@ -126,29 +126,28 @@ class View:
     def create_graph(self, window):
         fig = Figure(figsize=(5, 4), dpi=100)
         plot = fig.add_subplot(111)
-        line, = plot.plot([], [], marker='o')  # Linha vazia inicial com marcadores
+        line, = plot.plot([], [], marker='o')  
 
         canvas = FigureCanvasTkAgg(fig, master=window)
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.grid(row=0, column=1)
 
         def update_graph(x_data, y_data):
-            line.set_data(x_data, y_data)  # Atualiza os dados da linha
-            plot.relim()  # Atualiza os limites dos eixos
-            plot.autoscale_view()  # Redefine a escala dos eixos
-            canvas.draw()  # Redesenha o gráfico
+            line.set_data(x_data, y_data)  
+            plot.relim() 
+            plot.autoscale_view() 
+            canvas.draw() o
 
-        # Exemplo de função para fornecer novos dados
+       
         def get_new_data():
-            x_data = [1, 2, 3, 4]  # Seus próprios valores de x
-            y_data = [10, 5, 12, 7]  # Seus próprios valores de y
+            x_data = [1, 2, 3, 4]  
+            y_data = [10, 5, 12, 7]  
 
             update_graph(x_data, y_data)
-
-            # Agende a próxima atualização com novos dados (aqui, atualizamos a cada 5 segundos)
+          
             window.after(5000, get_new_data)
 
-        get_new_data()  # Inicializa a primeira atualização com dados iniciais
+        get_new_data()
 
     @staticmethod
     def get_pid(input_string):
@@ -171,8 +170,8 @@ class View:
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.grid(row=0, column=2)
 
-        x_data = []  # para armazenar pontos de tempo
-        y_data = []  # para armazenar dados de uso da CPU
+        x_data = []  
+        y_data = [] 
 
         def update_graph():
             y_value = self.controller.model.get_cpu_usage()
@@ -218,19 +217,19 @@ class View:
         canvas_widget.grid(row=0, column=4)
 
     def update_cpu_usage_graph(self):
-        # Obtenha o uso atual da CPU
+        
         current_cpu_usage = self.controller.model.get_cpu_usage()
 
-        # Adicione o uso atual ao histórico
+       
         self.cpu_data_history.append(current_cpu_usage)
 
-        # Atualize o gráfico
+       
         self.cpu_line.set_ydata(self.cpu_data_history)
         self.cpu_line.set_xdata(range(len(self.cpu_data_history)))
 
-        # Ajuste os limites do gráfico
+        
         self.cpu_ax.set_xlim(0, len(self.cpu_data_history))
-        self.cpu_ax.set_ylim(0, 100)  # Assumindo que é uma porcentagem
+        self.cpu_ax.set_ylim(0, 100)  
 
         self.cpu_ax.set_title('Uso da CPU ao longo do tempo')
 
@@ -242,46 +241,33 @@ class View:
         def extract_number(s):
             return float(re.search(r'(\d+\.?\d*)', s).group(1))
 
-        # Obtenha os dados da memória
+        
         mem_used_str = self.controller.model.get_memory_percent_used()
         mem_free_str = self.controller.model.get_memory_percent_free()
 
         mem_used = extract_number(mem_used_str)
         mem_free = extract_number(mem_free_str)
 
-        # Dados para o gráfico de pizza
+        
         memory_data = [mem_used, mem_free]
         labels = ['Used(%)', 'Free(%)']
         colors = ['red', 'green']
 
-        # Limpar o gráfico anterior (se existir)
         self.memory_ax.clear()
-
-        # Atualizar o gráfico de pizza
+        
         self.memory_ax.pie(memory_data, labels=labels, colors=colors, autopct='%1.1f%%')
         self.memory_ax.set_title('Memória livre vs utilizada (%)')
 
-        # Redesenhe o gráfico
         self.memory_canvas.draw()
 
     def update_processes_threads_bar_chart(self):
-        # Obtenha os dados
+        
         total_processes = self.controller.model.get_total_processes()
         total_threads = self.controller.model.get_total_threads()
-
-        # Dados para o gráfico de barras
         bar_data = [total_processes, total_threads]
         labels = ['Processes', 'Threads']
-
-        # Limpar o gráfico anterior (se existir)
         self.processes_threads_ax.clear()
-
-        # Atualizar o gráfico de barras
         self.processes_threads_ax.bar(labels, bar_data, color=['blue', 'purple'])
-
-        # Ajustes no gráfico
         self.processes_threads_ax.set_title("Processos vs. Threads")
         self.processes_threads_ax.set_ylabel("Número")
-
-        # Redesenhe o gráfico
         self.processes_threads_canvas.draw()
